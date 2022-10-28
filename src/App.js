@@ -4,7 +4,8 @@ import React, { useState } from "react";
 
 const App = () => {
   const [data, setData] = useState([]);
-  const onDelete = (key, e) => {
+  const onDelete = (key, e, t) => {
+    console.log(t);
     e.preventDefault();
     setData(data.filter((item) => item.key !== key));
   };
@@ -30,9 +31,9 @@ const App = () => {
       key: "x",
       render: (text, record) => (
         <a
-          onClick={(e) => {
-            onDelete(record.key, e);
-          }}
+        // onClick={(e) => {
+        //   onDelete(record.key, e,text);
+        // }}
         >
           Delete
         </a>
@@ -58,7 +59,7 @@ const App = () => {
                 item.address.city +
                 "," +
                 item.address.zipcode,
-              description: "",
+              description: "Email : " + item.email,
             };
             temp.push(row);
           });
@@ -68,6 +69,33 @@ const App = () => {
     };
     fetchfunc();
   }, []);
-  return <Table columns={columns} dataSource={data} />;
+  return (
+    <Table
+      columns={columns}
+      expandable={{
+        expandedRowRender: (record) => (
+          <p
+            style={{
+              margin: 0,
+            }}
+          >
+            {record.description}
+          </p>
+        ),
+        rowExpandable: (record) => record.name !== "Not Expandable",
+      }}
+      dataSource={data}
+      onRow={(recored, rowIndex) => {
+        return {
+          onClick: (event) => {
+            if(event.target.tagName==="A")
+            data.splice(rowIndex,1);
+            setData([...data])
+            console.log(recored, rowIndex, event);
+          },
+        };
+      }}
+    />
+  );
 };
 export default App;
